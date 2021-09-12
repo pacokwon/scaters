@@ -20,7 +20,7 @@ pub struct Cpu {
     // program counter
     pc: u16,
 
-    gfx: [u8; 64 * 32],
+    gfx: [bool; 64 * 32],
 
     delay_timer: u8,
 
@@ -48,14 +48,14 @@ pub struct Cpu {
 }
 
 impl Cpu {
-    fn new() -> Self {
+    pub fn new() -> Self {
         let mut cpu = Cpu {
             opcode: 0,
             memory: [0; 4096],
             reg: [0; 16],
             index: 0,
             pc: 0,
-            gfx: [0; 64 * 32],
+            gfx: [false; 64 * 32],
             delay_timer: 0,
             sound_timer: 0,
             stack: [0; 16],
@@ -143,7 +143,7 @@ impl Cpu {
     // clear the display
     fn cls(&mut self) {
         for i in 0..(64 * 32) {
-            self.gfx[i] = 0;
+            self.gfx[i] = false;
         }
 
         self.pc += 1;
