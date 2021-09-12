@@ -1,8 +1,13 @@
 mod bit;
 mod cpu;
+mod emu;
 mod font;
-use cpu::Cpu;
+mod graphics;
 
-fn main() {
-    println!("Hello, world!");
+use emu::Emulator;
+
+fn main() -> Result<(), String> {
+    let mut emu = Emulator::new()?;
+    emu.run_loop()?;
+    Ok(())
 }
