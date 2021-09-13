@@ -21,6 +21,16 @@ pub struct Cpu {
     // program counter
     pc: u16,
 
+    /**
+     * (0,0)                  (63,0)
+     *  ----------------------->
+     * | -----------------------
+     * | |                     |
+     * | |                     |
+     * | |                     |
+     * v -----------------------
+     * (0,31)                 (63,31)
+     */
     gfx: [bool; 64 * 32],
 
     delay_timer: u8,
@@ -418,8 +428,57 @@ impl Cpu {
         self.pc += 1;
     }
 
+    /**
+     * XOR sprites at display and set VF = collision
+     */
     fn draw_sprite(&mut self) {
-        todo!()
+        // this flag should be set if any bit is erased (1 -> 0)
+        let mut vf = 0;
+
+        let x = get_nth_nibble(self.opcode, 3) as usize;
+        let y = get_nth_nibble(self.opcode, 2) as usize;
+
+        let vx = self.reg[x];
+        let vy = self.reg[y];
+        let n = get_nth_nibble(self.opcode, 1);
+
+        for i in 0..n {
+            let pos_y = wrap_add(vy, i as u8);
+            let sprite_byte = self.memory[(self.index + i as u16) as usize];
+
+            // iterate through bits in sprite_byte
+            for j in 0..8 {
+                let pos_x = wrap_add(vx, j as u8);
+
+                let mask = 0x80 >> j;
+                let sprite_bit = sprite_byte & mask;
+
+                /* 0 ^ 0 = 0
+                 * 0 ^ 1 = 1
+                 * 1 ^ 0 = 1
+                 * 1 ^ 1 = 0
+                 */
+                // if sprite_bit is 0, the display won't change. so skip
+                if sprite_bit == 0 {
+                    continue;
+                }
+
+                let display_bit = self.gfx[(64 * pos_y + pos_x) as usize];
+
+                // if display bit is set, then it will be erased (1 -> 0)
+                // Collision!
+                if display_bit {
+                    vf = 1;
+                }
+
+                // since the sprite bit is 1, we know that rhs will be toggled
+                self.gfx[(64 * pos_y + pos_x) as usize] = !self.gfx[(64 * pos_y + pos_x) as usize];
+            }
+        }
+
+        self.reg[0xF] = vf;
+
+        self.pc += 1;
     }
 
     // skip next inst if key with value of Vx is pressed
