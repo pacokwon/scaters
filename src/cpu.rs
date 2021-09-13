@@ -1,6 +1,7 @@
-use rand::Rng;
 use crate::font;
+use crate::input;
 use crate::lib::{get_nth_nibble, wrap_add};
+use rand::Rng;
 
 pub struct Cpu {
     // opcode is two bytes long
@@ -453,7 +454,19 @@ impl Cpu {
     }
 
     fn ld_reg_key(&mut self) {
-        todo!("Keyboard must be implemented!")
+        let pressed_key_index = self.keyboard.iter().position(|&x| x);
+
+        match pressed_key_index {
+            Some(index) => {
+                assert!(index < 16);
+
+                let x = get_nth_nibble(self.opcode, 3) as usize;
+                self.reg[x] = input::KEYBOARD_VALUES[index];
+
+                self.pc += 1;
+            }
+            None => (), // pass until key is pressed
+        };
     }
 
     fn ld_dt_reg(&mut self) {
