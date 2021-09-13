@@ -83,11 +83,11 @@ impl Cpu {
             redraw: false,
         };
 
-        cpu.init_fonts();
+        cpu.load_fonts();
         cpu
     }
 
-    // initialize font mapping from 0x00 ~ 0x50
+    // load font mapping from 0x00 ~ 0x50
     // in this implementation, the fonts are stored as:
     // 0: $00-$04
     // 1: $05-$09
@@ -95,14 +95,24 @@ impl Cpu {
     // ...
     // F: $4B-$4F
     // http://www.cs.columbia.edu/~sedwards/classes/2016/4840-spring/designs/Chip8.pdf
-    fn init_fonts(&mut self) {
+    fn load_fonts(&mut self) {
         for addr in 0..0x50 {
             self.memory[addr] = font::FONTS[addr];
         }
     }
 
+    // load rom into memory. starts at 0x200
+    pub fn load_rom(&mut self, buf: &Vec<u8>) {
+        for (index, &c) in buf.iter().enumerate() {
+            self.memory[0x200 + index] = c;
+        }
+        self.pc = 0x200;
+    }
+
     pub fn execute_inst(&mut self) {
-        let opcode = self.opcode;
+        let opcode = (self.memory[self.pc as usize] as u16) << 8 | self.memory[(self.pc + 1) as usize] as u16;
+        self.opcode = opcode;
+
         let highest_byte = opcode >> 12;
         let lowest_byte = opcode & 0x000F;
 

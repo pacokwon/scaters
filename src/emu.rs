@@ -18,6 +18,12 @@ impl Emulator {
         Ok(Emulator { cpu, graphics })
     }
 
+    pub fn load_rom(&mut self, filename: &str) {
+        let buffer = std::fs::read(filename).unwrap();
+        println!("{:?}", buffer);
+        self.cpu.load_rom(&buffer);
+    }
+
     /**
      * Main loop of emulator
      *

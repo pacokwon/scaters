@@ -9,6 +9,7 @@ use emu::Emulator;
 
 fn main() -> Result<(), String> {
     let mut emu = Emulator::new()?;
+    emu.load_rom("roms/pong.ch8");
     emu.run_loop()?;
     Ok(())
 }
