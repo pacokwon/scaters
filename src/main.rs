@@ -2,7 +2,8 @@ mod bit;
 mod cpu;
 mod emu;
 mod font;
-mod graphics;
+mod gfx;
+mod input;
 
 use emu::Emulator;
 

@@ -32,7 +32,12 @@ pub struct Cpu {
 
     /**
      * Keyboard layout is as follows:
-     * true means pressed, otherwise false
+     * true means pressed, otherwise false.
+     *
+     * Index order is left to right, top to bottom.
+     *
+     * Also refer to `KEYBOARD_VALUES` at src/input.rs
+     * to see which index corresponds to which key value
      *
      * |---|---|---|---|
      * | 1 | 2 | 3 | C |
@@ -44,7 +49,7 @@ pub struct Cpu {
      * | A | 0 | B | F |
      * |---|---|---|---|
      */
-    keyboard: [bool; 16],
+    pub keyboard: [bool; 16],
 }
 
 impl Cpu {
@@ -81,7 +86,7 @@ impl Cpu {
         }
     }
 
-    fn run(&mut self) {
+    pub fn execute_inst(&mut self) {
         let opcode = self.opcode;
         let highest_byte = opcode >> 12;
         let lowest_byte = opcode & 0x000F;
