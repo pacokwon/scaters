@@ -31,7 +31,7 @@ pub struct Cpu {
      * v -----------------------
      * (0,31)                 (63,31)
      */
-    gfx: [bool; 64 * 32],
+    pub gfx: [bool; 64 * 32],
 
     delay_timer: u8,
 

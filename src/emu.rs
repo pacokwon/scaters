@@ -61,9 +61,7 @@ impl Emulator {
             }
 
             self.cpu.redraw = false;
-            let canvas = &mut self.graphics.canvas;
-            canvas.clear();
-            canvas.present();
+            self.graphics.draw(&self.cpu.gfx)?;
             ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 30)); // 30 fps
         }
 
