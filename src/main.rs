@@ -1,9 +1,9 @@
-mod bit;
 mod cpu;
 mod emu;
 mod font;
 mod gfx;
 mod input;
+mod lib;
 
 use emu::Emulator;
 

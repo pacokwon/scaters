@@ -1,3 +1,5 @@
+use std::num::Wrapping;
+
 /**
  * get_nth_nibble
  *
@@ -11,4 +13,13 @@ pub fn get_nth_nibble(num: u16, n: u8) -> u8 {
     let shift_width = (n - 1) * 4;
     let shifted = num >> shift_width;
     (shifted & 0xF) as u8
+}
+
+/**
+ * add with overflow / underflow
+ */
+pub fn wrap_add(a: u8, b: u8) -> u8 {
+    let a = Wrapping(a);
+    let b = Wrapping(b);
+    (a + b).0
 }

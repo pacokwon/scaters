@@ -1,6 +1,6 @@
 use rand::Rng;
 use crate::font;
-use crate::bit;
+use crate::lib::{get_nth_nibble, wrap_add};
 
 pub struct Cpu {
     // opcode is two bytes long
@@ -140,7 +140,7 @@ impl Cpu {
                 0x55 => self.ld_indirect_reg(),
                 0x65 => self.ld_reg_indirect(),
                 _ => panic!("Invalid Instruction {}", opcode),
-            }
+            },
             _ => unimplemented!(),
         }
     }
@@ -190,7 +190,7 @@ impl Cpu {
 
     // skip next instruction reg == byte
     fn se_reg_byte(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
         let kk = self.opcode & 0x00FF;
 
         let vx = self.reg[x] as u16;
@@ -204,7 +204,7 @@ impl Cpu {
 
     // skip next instruction reg != byte
     fn sne_reg_byte(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
         let kk = (self.opcode & 0x00FF) as u8;
 
         let vx = self.reg[x];
@@ -218,8 +218,8 @@ impl Cpu {
 
     // skip next instruction reg == reg
     fn se_reg_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
-        let y = bit::get_nth_nibble(self.opcode, 2) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
+        let y = get_nth_nibble(self.opcode, 2) as usize;
 
         let vx = self.reg[x];
         let vy = self.reg[y];
@@ -233,7 +233,7 @@ impl Cpu {
 
     // skip next instruction reg != reg
     fn ld_reg_byte(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
         let kk = (self.opcode & 0x00FF) as u8;
         self.reg[x] = kk;
 
@@ -242,7 +242,7 @@ impl Cpu {
 
     // add byte to register
     fn add_reg_byte(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
         let kk = (self.opcode & 0x00FF) as u8;
         self.reg[x] += kk;
 
@@ -251,8 +251,8 @@ impl Cpu {
 
     // load register value to another
     fn ld_reg_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
-        let y = bit::get_nth_nibble(self.opcode, 2) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
+        let y = get_nth_nibble(self.opcode, 2) as usize;
         self.reg[x] = self.reg[y];
 
         self.pc += 1;
@@ -260,8 +260,8 @@ impl Cpu {
 
     // OR register value with another
     fn or_reg_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
-        let y = bit::get_nth_nibble(self.opcode, 2) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
+        let y = get_nth_nibble(self.opcode, 2) as usize;
         self.reg[x] |= self.reg[y];
 
         self.pc += 1;
@@ -269,8 +269,8 @@ impl Cpu {
 
     // AND register value with another
     fn and_reg_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
-        let y = bit::get_nth_nibble(self.opcode, 2) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
+        let y = get_nth_nibble(self.opcode, 2) as usize;
         self.reg[x] &= self.reg[y];
 
         self.pc += 1;
@@ -278,8 +278,8 @@ impl Cpu {
 
     // XOR register value with another
     fn xor_reg_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
-        let y = bit::get_nth_nibble(self.opcode, 2) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
+        let y = get_nth_nibble(self.opcode, 2) as usize;
         self.reg[x] ^= self.reg[y];
 
         self.pc += 1;
@@ -287,8 +287,8 @@ impl Cpu {
 
     // add register value to another
     fn add_reg_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
-        let y = bit::get_nth_nibble(self.opcode, 2) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
+        let y = get_nth_nibble(self.opcode, 2) as usize;
 
         let vx = self.reg[x];
         let vy = self.reg[y];
@@ -307,8 +307,8 @@ impl Cpu {
 
     // subtract register value to another
     fn sub_reg_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
-        let y = bit::get_nth_nibble(self.opcode, 2) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
+        let y = get_nth_nibble(self.opcode, 2) as usize;
 
         let vx = self.reg[x];
         let vy = self.reg[y];
@@ -329,7 +329,7 @@ impl Cpu {
     // store shifted register value to another
     fn shr_reg_reg(&mut self) {
         // NOTE: cowgod's instruction manual doesn't use Vy, not sure why
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
         let vx = self.reg[x];
 
         self.reg[0xF] = vx & 0x1;
@@ -340,8 +340,8 @@ impl Cpu {
 
     // subn
     fn subn_reg_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
-        let y = bit::get_nth_nibble(self.opcode, 2) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
+        let y = get_nth_nibble(self.opcode, 2) as usize;
 
         let vx = self.reg[x];
         let vy = self.reg[y];
@@ -362,7 +362,7 @@ impl Cpu {
     // shl
     fn shl_reg_reg(&mut self) {
         // NOTE: cowgod's instruction manual doesn't use Vy, not sure why
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
         let vx = self.reg[x];
 
         self.reg[0xF] = (vx & 0x80) >> 7;
@@ -373,8 +373,8 @@ impl Cpu {
 
     // sne
     fn sne_reg_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
-        let y = bit::get_nth_nibble(self.opcode, 2) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
+        let y = get_nth_nibble(self.opcode, 2) as usize;
 
         let vx = self.reg[x];
         let vy = self.reg[y];
@@ -409,7 +409,7 @@ impl Cpu {
         let mut rng = rand::thread_rng();
         let rand_byte: u8 = rng.gen_range(0..=255);
 
-        let x = bit::get_nth_nibble(self.opcode, 3);
+        let x = get_nth_nibble(self.opcode, 3);
         let kk = (self.opcode & 0x00FF) as u8;
 
         self.reg[x as usize] = rand_byte & kk;
@@ -423,7 +423,7 @@ impl Cpu {
 
     // skip next inst if key with value of Vx is pressed
     fn skp_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
         let vx = self.reg[x] as usize;
 
         if self.keyboard[vx] {
@@ -435,7 +435,7 @@ impl Cpu {
 
     // skip next inst if key with value of Vx is not pressed
     fn sknp_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
         let vx = self.reg[x] as usize;
 
         if !self.keyboard[vx] {
@@ -446,7 +446,7 @@ impl Cpu {
     }
 
     fn ld_reg_dt(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
         self.reg[x] = self.delay_timer;
 
         self.pc += 1;
@@ -457,28 +457,28 @@ impl Cpu {
     }
 
     fn ld_dt_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
         self.delay_timer = self.reg[x];
 
         self.pc += 1;
     }
 
     fn ld_st_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
         self.sound_timer = self.reg[x];
 
         self.pc += 1;
     }
 
     fn add_index_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
         self.index += self.reg[x] as u16;
 
         self.pc += 1;
     }
 
     fn ld_sprite_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
         let vx = self.reg[x] as u16;
         assert!(vx <= 0xF);
 
@@ -488,7 +488,7 @@ impl Cpu {
     }
 
     fn ld_bcd_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3) as usize;
+        let x = get_nth_nibble(self.opcode, 3) as usize;
         let vx = self.reg[x];
 
         let index = self.index as usize;
@@ -501,7 +501,7 @@ impl Cpu {
     }
 
     fn ld_indirect_reg(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3);
+        let x = get_nth_nibble(self.opcode, 3);
         let index = self.index as usize;
 
         for i in 0..=x {
@@ -512,7 +512,7 @@ impl Cpu {
     }
 
     fn ld_reg_indirect(&mut self) {
-        let x = bit::get_nth_nibble(self.opcode, 3);
+        let x = get_nth_nibble(self.opcode, 3);
         let index = self.index as usize;
 
         for i in 0..=x {
