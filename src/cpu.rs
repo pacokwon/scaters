@@ -162,7 +162,7 @@ impl Cpu {
             self.gfx[i] = false;
         }
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // return from subroutine
@@ -178,7 +178,7 @@ impl Cpu {
         let ret_addr = self.stack[self.sp as usize];
         self.pc = ret_addr;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // jump to location nnn
@@ -207,9 +207,9 @@ impl Cpu {
         let vx = self.reg[x] as u16;
 
         if vx == kk {
-            self.pc += 2;
+            self.pc += 4;
         } else {
-            self.pc += 1;
+            self.pc += 2;
         }
     }
 
@@ -221,9 +221,9 @@ impl Cpu {
         let vx = self.reg[x];
 
         if vx != kk {
-            self.pc += 2;
+            self.pc += 4;
         } else {
-            self.pc += 1;
+            self.pc += 2;
         }
     }
 
@@ -236,9 +236,9 @@ impl Cpu {
         let vy = self.reg[y];
 
         if vx == vy {
-            self.pc += 2;
+            self.pc += 4;
         } else {
-            self.pc += 1;
+            self.pc += 2;
         }
     }
 
@@ -248,7 +248,7 @@ impl Cpu {
         let kk = (self.opcode & 0x00FF) as u8;
         self.reg[x] = kk;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // add byte to register
@@ -257,7 +257,7 @@ impl Cpu {
         let kk = (self.opcode & 0x00FF) as u8;
         self.reg[x] += kk;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // load register value to another
@@ -266,7 +266,7 @@ impl Cpu {
         let y = get_nth_nibble(self.opcode, 2) as usize;
         self.reg[x] = self.reg[y];
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // OR register value with another
@@ -275,7 +275,7 @@ impl Cpu {
         let y = get_nth_nibble(self.opcode, 2) as usize;
         self.reg[x] |= self.reg[y];
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // AND register value with another
@@ -284,7 +284,7 @@ impl Cpu {
         let y = get_nth_nibble(self.opcode, 2) as usize;
         self.reg[x] &= self.reg[y];
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // XOR register value with another
@@ -293,7 +293,7 @@ impl Cpu {
         let y = get_nth_nibble(self.opcode, 2) as usize;
         self.reg[x] ^= self.reg[y];
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // add register value to another
@@ -313,7 +313,7 @@ impl Cpu {
 
         self.reg[x as usize] = vx + vy;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // subtract register value to another
@@ -334,7 +334,7 @@ impl Cpu {
 
         self.reg[x] = vx - vy;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // store shifted register value to another
@@ -346,7 +346,7 @@ impl Cpu {
         self.reg[0xF] = vx & 0x1;
         self.reg[x] >>= 1;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // subn
@@ -367,7 +367,7 @@ impl Cpu {
 
         self.reg[x] = vy - vx;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // shl
@@ -379,7 +379,7 @@ impl Cpu {
         self.reg[0xF] = (vx & 0x80) >> 7;
         self.reg[x] <<= 1;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // sne
@@ -393,9 +393,9 @@ impl Cpu {
         // NOTE: instruction says set VF to "NOT borrow"
         // watch out for the equal sign
         if vx != vy {
-            self.pc += 2;
+            self.pc += 4;
         } else {
-            self.pc += 1;
+            self.pc += 2;
         }
     }
 
@@ -404,7 +404,7 @@ impl Cpu {
         let nnn = self.opcode & 0x0FFF;
         self.index = nnn;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // jump to location nnn + v0
@@ -425,7 +425,7 @@ impl Cpu {
 
         self.reg[x as usize] = rand_byte & kk;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     /**
@@ -478,7 +478,7 @@ impl Cpu {
 
         self.reg[0xF] = vf;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     // skip next inst if key with value of Vx is pressed
@@ -487,9 +487,9 @@ impl Cpu {
         let vx = self.reg[x] as usize;
 
         if self.keyboard[vx] {
-            self.pc += 2;
+            self.pc += 4;
         } else {
-            self.pc += 1;
+            self.pc += 2;
         }
     }
 
@@ -499,9 +499,9 @@ impl Cpu {
         let vx = self.reg[x] as usize;
 
         if !self.keyboard[vx] {
-            self.pc += 2;
+            self.pc += 4;
         } else {
-            self.pc += 1;
+            self.pc += 2;
         }
     }
 
@@ -509,7 +509,7 @@ impl Cpu {
         let x = get_nth_nibble(self.opcode, 3) as usize;
         self.reg[x] = self.delay_timer;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     fn ld_reg_key(&mut self) {
@@ -522,7 +522,7 @@ impl Cpu {
                 let x = get_nth_nibble(self.opcode, 3) as usize;
                 self.reg[x] = input::KEYBOARD_VALUES[index];
 
-                self.pc += 1;
+                self.pc += 2;
             }
             None => (), // pass until key is pressed
         };
@@ -532,21 +532,21 @@ impl Cpu {
         let x = get_nth_nibble(self.opcode, 3) as usize;
         self.delay_timer = self.reg[x];
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     fn ld_st_reg(&mut self) {
         let x = get_nth_nibble(self.opcode, 3) as usize;
         self.sound_timer = self.reg[x];
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     fn add_index_reg(&mut self) {
         let x = get_nth_nibble(self.opcode, 3) as usize;
         self.index += self.reg[x] as u16;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     fn ld_sprite_reg(&mut self) {
@@ -556,7 +556,7 @@ impl Cpu {
 
         self.index = vx * 0x5;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     fn ld_bcd_reg(&mut self) {
@@ -569,7 +569,7 @@ impl Cpu {
         self.memory[index + 1] = (vx / 10) % 10;
         self.memory[index + 2] = vx % 10;
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     fn ld_indirect_reg(&mut self) {
@@ -580,7 +580,7 @@ impl Cpu {
             self.memory[index + i as usize] = self.reg[i as usize];
         }
 
-        self.pc += 1;
+        self.pc += 2;
     }
 
     fn ld_reg_indirect(&mut self) {
@@ -591,6 +591,6 @@ impl Cpu {
             self.reg[i as usize] = self.memory[index + i as usize];
         }
 
-        self.pc += 1;
+        self.pc += 2;
     }
 }
