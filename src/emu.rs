@@ -50,6 +50,11 @@ impl Emulator {
             self.cpu.execute_inst();
 
             // 3. update screen
+            if !self.cpu.redraw {
+                continue
+            }
+
+            self.cpu.redraw = false;
             let canvas = &mut self.graphics.canvas;
             canvas.clear();
             canvas.present();

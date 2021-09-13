@@ -61,6 +61,9 @@ pub struct Cpu {
      * |---|---|---|---|
      */
     pub keyboard: [bool; 16],
+
+    // should the display be redrawn?
+    pub redraw: bool,
 }
 
 impl Cpu {
@@ -77,6 +80,7 @@ impl Cpu {
             stack: [0; 16],
             sp: 0,
             keyboard: [false; 16],
+            redraw: false,
         };
 
         cpu.init_fonts();
@@ -162,6 +166,7 @@ impl Cpu {
             self.gfx[i] = false;
         }
 
+        self.redraw = true;
         self.pc += 2;
     }
 
@@ -476,8 +481,8 @@ impl Cpu {
             }
         }
 
+        self.redraw = true;
         self.reg[0xF] = vf;
-
         self.pc += 2;
     }
 
