@@ -3,6 +3,8 @@ use crate::input;
 use crate::lib::*;
 use rand::Rng;
 
+const DEBUG: bool = false;
+
 pub struct Cpu {
     // opcode is two bytes long
     opcode: u16,
@@ -87,14 +89,16 @@ impl Cpu {
         cpu
     }
 
-    // load font mapping from 0x00 ~ 0x50
-    // in this implementation, the fonts are stored as:
-    // 0: $00-$04
-    // 1: $05-$09
-    // 2: $0A-$0E
-    // ...
-    // F: $4B-$4F
-    // http://www.cs.columbia.edu/~sedwards/classes/2016/4840-spring/designs/Chip8.pdf
+    /**
+     * load font mapping from 0x00 ~ 0x50
+     * in this implementation, the fonts are stored as:
+     * 0: $00-$04
+     * 1: $05-$09
+     * 2: $0A-$0E
+     * ...
+     * F: $4B-$4F
+     * http://www.cs.columbia.edu/~sedwards/classes/2016/4840-spring/designs/Chip8.pdf
+     */
     fn load_fonts(&mut self) {
         for addr in 0..0x50 {
             self.memory[addr] = font::FONTS[addr];
@@ -109,8 +113,26 @@ impl Cpu {
         self.pc = 0x200;
     }
 
+    pub fn dump_state(&mut self) {
+        println!("opcode: {:#04x}", self.opcode);
+        println!("Registers:  V0  V1  V2  V3  V4  V5  V6  V7  V8  V9  VA  VB  VC  VD  VE  VF");
+
+        print!("          ");
+        for v in self.reg {
+            print!(" {:#03x}", v);
+        }
+        println!();
+
+        println!("I: {:#04x}\tPC: {:#04x}\tSP: {:#04x}", self.index, self.pc, self.sp);
+    }
+
     pub fn execute_inst(&mut self) {
-        let opcode = (self.memory[self.pc as usize] as u16) << 8 | self.memory[(self.pc + 1) as usize] as u16;
+        if DEBUG {
+            self.dump_state();
+        }
+
+        let opcode = (self.memory[self.pc as usize] as u16) << 8
+            | self.memory[(self.pc + 1) as usize] as u16;
         self.opcode = opcode;
 
         let highest_byte = opcode >> 12;
