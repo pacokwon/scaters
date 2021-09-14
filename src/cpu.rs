@@ -504,7 +504,9 @@ impl Cpu {
                     continue;
                 }
 
-                let display_bit = self.gfx[(64 * pos_y + pos_x) as usize];
+                let point_index = ((64 * pos_y + pos_x + 64 * 32) % (64 * 32)) as usize;
+
+                let display_bit = self.gfx[point_index];
 
                 // if display bit is set, then it will be erased (1 -> 0)
                 // Collision!
@@ -513,7 +515,7 @@ impl Cpu {
                 }
 
                 // since the sprite bit is 1, we know that rhs will be toggled
-                self.gfx[(64 * pos_y + pos_x) as usize] = !self.gfx[(64 * pos_y + pos_x) as usize];
+                self.gfx[point_index] = !self.gfx[point_index];
             }
         }
 
