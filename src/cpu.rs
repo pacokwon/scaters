@@ -1,6 +1,6 @@
 use crate::font;
 use crate::input;
-use crate::lib::{get_nth_nibble, wrap_add};
+use crate::lib::*;
 use rand::Rng;
 
 pub struct Cpu {
@@ -270,7 +270,7 @@ impl Cpu {
     fn add_reg_byte(&mut self) {
         let x = get_nth_nibble(self.opcode, 3) as usize;
         let kk = (self.opcode & 0x00FF) as u8;
-        self.reg[x] += kk;
+        self.reg[x] = wrap_add(self.reg[x], kk);
 
         self.pc += 2;
     }
@@ -326,7 +326,7 @@ impl Cpu {
             self.reg[0xF] = 0;
         }
 
-        self.reg[x as usize] = vx + vy;
+        self.reg[x as usize] = wrap_add(vx, vy);
 
         self.pc += 2;
     }
@@ -347,7 +347,7 @@ impl Cpu {
             self.reg[0xF] = 0;
         }
 
-        self.reg[x] = vx - vy;
+        self.reg[x] = wrap_sub(vx, vy);
 
         self.pc += 2;
     }
@@ -380,7 +380,7 @@ impl Cpu {
             self.reg[0xF] = 0;
         }
 
-        self.reg[x] = vy - vx;
+        self.reg[x] = wrap_sub(vy, vx);
 
         self.pc += 2;
     }
@@ -458,12 +458,12 @@ impl Cpu {
         let n = get_nth_nibble(self.opcode, 1);
 
         for i in 0..n {
-            let pos_y = wrap_add(vy, i as u8);
+            let pos_y = wrap_add(vy, i as u8) as u16;
             let sprite_byte = self.memory[(self.index + i as u16) as usize];
 
             // iterate through bits in sprite_byte
             for j in 0..8 {
-                let pos_x = wrap_add(vx, j as u8);
+                let pos_x = wrap_add(vx, j as u8) as u16;
 
                 let mask = 0x80 >> j;
                 let sprite_bit = sprite_byte & mask;

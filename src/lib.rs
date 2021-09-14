@@ -23,3 +23,12 @@ pub fn wrap_add(a: u8, b: u8) -> u8 {
     let b = Wrapping(b);
     (a + b).0
 }
+
+/**
+ * sub with overflow / underflow
+ */
+pub fn wrap_sub(a: u8, b: u8) -> u8 {
+    let a = Wrapping(a);
+    let b = Wrapping(b);
+    (a - b).0
+}
