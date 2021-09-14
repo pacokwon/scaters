@@ -1,5 +1,4 @@
 use crate::font;
-use crate::input;
 use crate::lib::*;
 use rand::Rng;
 
@@ -47,10 +46,8 @@ pub struct Cpu {
      * Keyboard layout is as follows:
      * true means pressed, otherwise false.
      *
-     * Index order is left to right, top to bottom.
-     *
-     * Also refer to `KEYBOARD_VALUES` at src/input.rs
-     * to see which index corresponds to which key value
+     * e.g. if keyboard[0xC] == true, then it means that the key
+     * corresponding to the button `C` is pressed. (4 is default)
      *
      * |---|---|---|---|
      * | 1 | 2 | 3 | C |
@@ -563,7 +560,7 @@ impl Cpu {
                 assert!(index < 16);
 
                 let x = get_nth_nibble(self.opcode, 3) as usize;
-                self.reg[x] = input::KEYBOARD_VALUES[index];
+                self.reg[x] = index as u8;
 
                 self.pc += 2;
             }

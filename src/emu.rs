@@ -1,6 +1,6 @@
 use crate::cpu::Cpu;
 use crate::gfx::Graphics;
-use crate::input;
+use crate::lib;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
@@ -78,13 +78,13 @@ impl Emulator {
     }
 
     fn handle_keydown(&mut self, keycode: Keycode) {
-        if let Some(index) = input::keycode_to_index(keycode) {
+        if let Some(index) = lib::keycode_to_index(keycode) {
             self.cpu.keyboard[index] = true;
         }
     }
 
     fn handle_keyup(&mut self, keycode: Keycode) {
-        if let Some(index) = input::keycode_to_index(keycode) {
+        if let Some(index) = lib::keycode_to_index(keycode) {
             self.cpu.keyboard[index as usize] = false;
         }
     }
