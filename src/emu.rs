@@ -8,6 +8,7 @@ use std::time::Duration;
 pub struct Emulator {
     cpu: Cpu,
     graphics: Graphics,
+    fps: u32,
 }
 
 impl Emulator {
@@ -15,7 +16,11 @@ impl Emulator {
         let cpu = Cpu::new();
         let graphics = Graphics::new()?;
 
-        Ok(Emulator { cpu, graphics })
+        Ok(Emulator {
+            cpu,
+            graphics,
+            fps: 1000, // 1000 fps by default
+        })
     }
 
     pub fn load_rom(&mut self, filename: &str) {
@@ -62,16 +67,9 @@ impl Emulator {
             }
 
             // 4. update timers
-            if self.cpu.delay_timer > 0 {
-                self.cpu.delay_timer -= 1;
-            }
+            self.cpu.update_timers(self.fps);
 
-            if self.cpu.sound_timer > 0 {
-                self.cpu.sound_timer -= 1;
-                // TODO: play sound. to be implemented
-            }
-
-            ::std::thread::sleep(Duration::new(0, 1_000_000u32)); // 1 millisecond
+            ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / self.fps));
         }
 
         Ok(())

@@ -38,6 +38,8 @@ pub struct Cpu {
 
     pub sound_timer: u8,
 
+    timer_cycles: u32,
+
     stack: [u16; 16],
 
     sp: u8,
@@ -80,6 +82,7 @@ impl Cpu {
             sp: 0,
             keyboard: [false; 16],
             redraw: false,
+            timer_cycles: 0,
         };
 
         cpu.load_fonts();
@@ -110,6 +113,32 @@ impl Cpu {
         self.pc = 0x200;
     }
 
+    /**
+     * update_timers
+     * fps: at what frame rate is this emulator running at?
+     */
+    pub fn update_timers(&mut self, fps: u32) {
+        self.timer_cycles += 1;
+
+        // the timers should be updated at 60fps speed.
+        // since emulating 60fps shows very laggy gameplay,
+        // this emulator allows custom fps (1000fps by default)
+        // so use a custom cycle variable to stay true to the original
+        // update rate
+        if self.timer_cycles == (fps / 60) {
+            if self.delay_timer > 0 {
+                self.delay_timer -= 1;
+            }
+
+            if self.sound_timer > 0 {
+                self.sound_timer -= 1;
+                // TODO: play sound. to be implemented
+            }
+
+            self.timer_cycles = 0;
+        }
+    }
+
     pub fn dump_state(&mut self) {
         println!("opcode: {:#04x}", self.opcode);
         println!("Registers:   V0   V1   V2   V3   V4   V5   V6   V7   V8   V9   VA   VB   VC   VD   VE   VF");
@@ -120,7 +149,10 @@ impl Cpu {
         }
         println!();
 
-        println!("I: {:#04x}\tPC: {:#04x}\tSP: {:#04x}", self.index, self.pc, self.sp);
+        println!(
+            "I: {:#04x}\tPC: {:#04x}\tSP: {:#04x}",
+            self.index, self.pc, self.sp
+        );
 
         println!("Delay: {}\tSound: {}", self.delay_timer, self.sound_timer);
 
