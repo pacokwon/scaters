@@ -35,9 +35,9 @@ pub struct Cpu {
      */
     pub gfx: [bool; 64 * 32],
 
-    delay_timer: u8,
+    pub delay_timer: u8,
 
-    sound_timer: u8,
+    pub sound_timer: u8,
 
     stack: [u16; 16],
 
@@ -115,15 +115,19 @@ impl Cpu {
 
     pub fn dump_state(&mut self) {
         println!("opcode: {:#04x}", self.opcode);
-        println!("Registers:  V0  V1  V2  V3  V4  V5  V6  V7  V8  V9  VA  VB  VC  VD  VE  VF");
+        println!("Registers:   V0   V1   V2   V3   V4   V5   V6   V7   V8   V9   VA   VB   VC   VD   VE   VF");
 
         print!("          ");
         for v in self.reg {
-            print!(" {:#03x}", v);
+            print!(" {:#04x}", v);
         }
         println!();
 
         println!("I: {:#04x}\tPC: {:#04x}\tSP: {:#04x}", self.index, self.pc, self.sp);
+
+        println!("Delay: {}\tSound: {}", self.delay_timer, self.sound_timer);
+
+        println!();
     }
 
     pub fn execute_inst(&mut self) {

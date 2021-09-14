@@ -1,6 +1,6 @@
-use crate::input;
 use crate::cpu::Cpu;
 use crate::gfx::Graphics;
+use crate::input;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
@@ -29,6 +29,7 @@ impl Emulator {
      * 1. listen to & handle events
      * 2. run opcode
      * 3. update screen
+     * 4. update timers
      */
     pub fn run_loop(&mut self) -> Result<(), String> {
         let ctx = &mut self.graphics.ctx;
@@ -47,7 +48,7 @@ impl Emulator {
                         keycode: Some(keycode),
                         ..
                     } => self.handle_keyup(keycode),
-                    _ => ()
+                    _ => (),
                 }
             }
 
@@ -55,12 +56,21 @@ impl Emulator {
             self.cpu.execute_inst();
 
             // 3. update screen
-            if !self.cpu.redraw {
-                continue
+            if self.cpu.redraw {
+                self.cpu.redraw = false;
+                self.graphics.draw(&self.cpu.gfx)?;
             }
 
-            self.cpu.redraw = false;
-            self.graphics.draw(&self.cpu.gfx)?;
+            // 4. update timers
+            if self.cpu.delay_timer > 0 {
+                self.cpu.delay_timer -= 1;
+            }
+
+            if self.cpu.sound_timer > 0 {
+                self.cpu.sound_timer -= 1;
+                // TODO: play sound. to be implemented
+            }
+
             ::std::thread::sleep(Duration::new(0, 1_000_000u32)); // 1 millisecond
         }
 
