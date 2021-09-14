@@ -19,7 +19,7 @@ impl Graphics {
         let video_subsys = ctx.video()?;
 
         let window = video_subsys
-            .window("REMU", 640, 320)
+            .window("SCATERS", 1280, 640)
             .build()
             .map_err(|e| e.to_string())?;
 
@@ -31,7 +31,7 @@ impl Graphics {
         Ok(Self {
             ctx,
             canvas,
-            pixel_length: 10,
+            pixel_length: 20,
         })
     }
 

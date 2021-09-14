@@ -90,7 +90,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "remu"
+name = "scaters"
 version = "0.1.0"
 dependencies = [
  "rand",

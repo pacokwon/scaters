@@ -11,7 +11,7 @@ fn main() -> Result<(), String> {
     let args: Vec<String> = env::args().collect();
 
     if args.len() < 2 {
-        eprintln!("Usage: ./remu <path-to-rom>");
+        eprintln!("Usage: ./scaters <path-to-rom>");
         std::process::exit(1);
     }
 
