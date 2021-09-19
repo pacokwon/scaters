@@ -168,14 +168,14 @@ impl Cpu {
             | self.memory[(self.pc + 1) as usize] as u16;
         self.opcode = opcode;
 
-        let highest_byte = opcode >> 12;
-        let lowest_byte = opcode & 0x000F;
+        let highest_nibble = opcode >> 12;
+        let lowest_nibble = opcode & 0x000F;
 
-        let lower_three_bytes = opcode & 0x0FFF;
-        let lower_two_bytes = opcode & 0x00FF;
+        let lower_three_nibbles = opcode & 0x0FFF;
+        let lower_two_nibbles = opcode & 0x00FF;
 
-        match highest_byte {
-            0x0 => match lower_three_bytes {
+        match highest_nibble {
+            0x0 => match lower_three_nibbles {
                 0x0E0 => self.cls(),
                 0x0EE => self.ret(),
                 _ => panic!("Invalid Instruction {}", opcode),
@@ -187,7 +187,7 @@ impl Cpu {
             0x5 => self.se_reg_reg(),
             0x6 => self.ld_reg_byte(),
             0x7 => self.add_reg_byte(),
-            0x8 => match lowest_byte {
+            0x8 => match lowest_nibble {
                 0x0 => self.ld_reg_reg(),
                 0x1 => self.or_reg_reg(),
                 0x2 => self.and_reg_reg(),
@@ -204,12 +204,12 @@ impl Cpu {
             0xB => self.jmp_rel(),
             0xC => self.rnd_reg_byte(),
             0xD => self.draw_sprite(),
-            0xE => match lower_two_bytes {
+            0xE => match lower_two_nibbles {
                 0x9E => self.skp_reg(),
                 0xA1 => self.sknp_reg(),
                 _ => panic!("Invalid Instruction {}", opcode),
             },
-            0xF => match lower_two_bytes {
+            0xF => match lower_two_nibbles {
                 0x07 => self.ld_reg_dt(),
                 0x0A => self.ld_reg_key(),
                 0x15 => self.ld_dt_reg(),
